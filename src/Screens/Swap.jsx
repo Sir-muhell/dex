@@ -305,33 +305,6 @@ const Swap = () => {
         amountInWei // Amount of tokens to approve for spending
       );
 
-      // Estimate gas limit
-      const gasLimit = await signer.estimateGas(
-        amountInWei.toString(), // Amount of token to swap
-        "0", // Minimum amount of tokenOut to receive (0 for no minimum)
-        [tokenInAddress, tokenOutAddress], // Path of tokens to swap
-        accounts.toString(), // Recipient of tokenOut
-        deadline // Deadline for the swap
-      );
-
-      // Get current gas price
-      const gasPrice = await signer.getGasPrice();
-
-      // Calculate total gas fee
-      const totalGasFee = gasLimit.mul(gasPrice);
-
-      // Add extra gas fee (miner tipping) if desired
-      const totalAmountWithTip = totalGasFee.add(extraGasFee);
-
-      // Show gas fee to the user
-      alert(`
-        Estimated Gas Fee: ${ethers.formatEther(totalGasFee)} ETH
-        Current Gas Price: ${gasPrice.toString()} wei
-        Total Amount with Miner Tipping: ${ethers.formatEther(
-          totalAmountWithTip
-        )} ETH
-      `);
-
       // Proceed with the swap only if the user confirms
       const confirmed = window.confirm("Do you want to proceed with the swap?");
       if (!confirmed) return;

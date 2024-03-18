@@ -1,5 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./App.css";
+
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Swap from "./Screens/Swap";
 

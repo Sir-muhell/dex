@@ -315,8 +315,7 @@ const Swap = () => {
         "0", // Minimum amount of tokenOut to receive (0 for no minimum)
         [tokenInAddress, tokenOutAddress], // Path of tokens to swap
         accounts.toString(), // Recipient of tokenOut
-        deadline, // Deadline for the swap
-        { gasLimit: gasLimit.add(10000), gasPrice: gasPrice.add(extraGasFee) } // Specify gas limit and gas price
+        deadline // Deadline for the swap
       );
 
       await tx.wait(); // Wait for transaction to be mined

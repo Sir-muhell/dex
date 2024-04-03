@@ -63,7 +63,7 @@
   appearance: none; /* Remove increase/decrease arrows */
   -moz-appearance: textfield;
   margin: 0;
-  max-width: 170px;
+  max-width: 270px;
   text-align: right;
   -webkit-appearance: none; /* Remove increase/decrease arrows for Safari */
 }

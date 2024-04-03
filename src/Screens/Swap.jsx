@@ -16,6 +16,7 @@ import TOKEN from "../tokens.json";
 import ABI from "../assets/abi.json";
 import UNIABI from "../assets/uniAbi.json";
 import { Web3Provider } from "@ethersproject/providers";
+import Image from "../assets/cu.jpg";
 
 const Swap = () => {
   const [amount, setAmount] = useState("0.00");
@@ -27,6 +28,10 @@ const Swap = () => {
   const [tokenTwo, setTokenTwo] = useState("");
   const [changeToken, setChangeToken] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
+
+  if (tokenOne === "0.00") {
+    setTokenTwo("0.00");
+  }
 
   useEffect(() => {
     const fetchTokenList = async () => {
@@ -47,7 +52,16 @@ const Swap = () => {
             "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png",
         };
 
-        const updatedTokenList = [newToken, ...fetchedTokenList]; // Prepend the new token
+        const newToken2 = {
+          chainId: 1,
+          address: "0xa0c7e61ee4faa9fcefdc8e8fc5697d54bf8c8141",
+          name: "Curiosity Anon",
+          symbol: "CA",
+          decimals: 18,
+          logoURI: Image,
+        };
+
+        const updatedTokenList = [newToken, newToken2, ...fetchedTokenList]; // Prepend the new token
         setTokens(updatedTokenList);
       } catch (error) {
         console.error("Error fetching token list:", error);
@@ -267,7 +281,8 @@ const Swap = () => {
       // console.log(expectedAmountOut);
       setAmount(expectedAmountOut);
     } catch (error) {
-      console.error("Error getting expected amount out:", error);
+      // console.error("Error getting expected amount out:", error);
+      setAmount("0.00");
     }
   };
 
@@ -468,7 +483,7 @@ const Swap = () => {
           </div>
 
           <p className="text-xs pt-2 text-gray-500">
-            Choose a pair of token to mak a sawp
+            Choose a pair of token to make a swap
           </p>
           <div className="relative">
             <div className="bg-black mt-5 p-5 grid grid-cols-2">

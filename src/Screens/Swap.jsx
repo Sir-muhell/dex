@@ -410,7 +410,7 @@ const Swap = () => {
         <Input placeholder="Custom" onChange={handleSlippageChange} />
       </div>
 
-      <div className="mt-4">Extra Gas</div>
+      <div className="mt-4">Miner Tip</div>
       <div className="mt-1">
         <Input placeholder="0.5 Eth" onChange={handleGas} />
       </div>

@@ -279,7 +279,7 @@ const Swap = () => {
       // console.log(expectedAmountOut);
       setAmount(expectedAmountOut);
     } catch (error) {
-      // console.error("Error getting expected amount out:", error);
+      console.error("Error getting expected amount out:", error);
       setAmount("0.00");
     }
   };
@@ -344,7 +344,7 @@ const Swap = () => {
           : 0;
 
         const functionName =
-          "swapExactETHForTokens(uint256,address[],address,uint256,uint256)";
+          "swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)";
         const contractParams = [
           "0", // Minimum amount of tokenOut to receive (0 for no minimum)
           ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", tokenOutAddress], // Path of tokens to swap

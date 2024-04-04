@@ -1,4 +1,4 @@
 [
   "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)",
-  "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external virtual payable returns (uint[] memory amounts)"
+  "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)"
 ]

@@ -244,7 +244,11 @@ const Swap = () => {
 
   const uniswapRouterAddress = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
 
-  const uniswapRouter = new Contract(uniswapRouterAddress, UNIABI, signer);
+  const uniswapRouter = new ethers.Contract(
+    uniswapRouterAddress,
+    UNIABI,
+    signer
+  );
 
   const getExpectedAmountOut = async (tokenIn, tokenOut, amountIn) => {
     try {

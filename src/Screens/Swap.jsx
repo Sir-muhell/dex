@@ -11,7 +11,7 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
-import { ethers, Contract } from "ethers";
+import { ethers } from "ethers";
 import TOKEN from "../tokens.json";
 import ABI from "../assets/abi.json";
 import UNIABI from "../assets/uniAbi.json";
@@ -242,14 +242,14 @@ const Swap = () => {
 
   // handleTokenSelect(tokenTwo);
 
-  const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // Uniswap V2 Router contract address
-  // const uniswapRouterAddress = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
+  // const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // Uniswap V2 Router contract address
+  const uniswapRouter = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
 
-  const uniswapRouter = new ethers.Contract(
-    uniswapRouterAddress,
-    UNIABI,
-    signer
-  );
+  // const uniswapRouter = new ethers.Contract(
+  //   uniswapRouterAddress,
+  //   UNIABI,
+  //   signer
+  // );
 
   const getExpectedAmountOut = async (tokenIn, tokenOut, amountIn) => {
     try {
@@ -341,15 +341,15 @@ const Swap = () => {
       const bribe = ethers.toBigInt(
         Math.floor(extraGasFee * 1e18) + gasLimit.toString()
       );
+      console.log(bribe);
       let tx; // Declare tx variable outside of conditional blocks
 
       if (tokenInAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
         const weiGasAmount = extraGasFee
           ? ethers.parseUnits(extraGasFee, "gwei")
           : 0;
-
-        const functionName =
-          "swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)";
+        // (uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)
+        const functionName = "swapExactETHForTokens";
         const contractParams = [
           "0", // Minimum amount of tokenOut to receive (0 for no minimum)
           ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", tokenOutAddress], // Path of tokens to swap

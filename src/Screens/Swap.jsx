@@ -242,9 +242,7 @@ const Swap = () => {
 
   // handleTokenSelect(tokenTwo);
 
-  // const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // Uniswap V2 Router contract address
   const uniswapRouterAddress = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
-  // const uniswapRouterAddress = "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008"; // Testnet
 
   const uniswapRouter = new Contract(uniswapRouterAddress, UNIABI, signer);
 

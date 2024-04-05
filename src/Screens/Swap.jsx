@@ -243,13 +243,14 @@ const Swap = () => {
   // handleTokenSelect(tokenTwo);
 
   // const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // Uniswap V2 Router contract address
-  const uniswapRouter = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
+  const uniswapRouterAddress = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
+  // const uniswapRouterAddress = "0xf7ffec16b53f5575fb4d9a561b0ef132eac188d3";
 
-  // const uniswapRouter = new ethers.Contract(
-  //   uniswapRouterAddress,
-  //   UNIABI,
-  //   signer
-  // );
+  const uniswapRouter = new ethers.Contract(
+    uniswapRouterAddress,
+    UNIABI,
+    signer
+  );
 
   const getExpectedAmountOut = async (tokenIn, tokenOut, amountIn) => {
     try {

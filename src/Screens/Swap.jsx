@@ -12,10 +12,11 @@ import {
 } from "@ant-design/icons";
 import axios from "axios";
 import { ethers } from "ethers";
+import { InfuraProvider } from "ethers";
 import TOKEN from "../tokens.json";
 import ABI from "../assets/abi.json";
 import UNIABI from "../assets/uniAbi.json";
-import { Web3Provider } from "@ethersproject/providers";
+// import { Web3Provider } from "@ethersproject/providers";
 import Image from "../assets/cu.jpg";
 
 const Swap = () => {
@@ -61,7 +62,31 @@ const Swap = () => {
           logoURI: Image,
         };
 
-        const updatedTokenList = [newToken, newToken2, ...fetchedTokenList]; // Prepend the new token
+        const newToken3 = {
+          chainId: 1,
+          address: "0x92Fbd0E76Fa70a13a1D7Eb6B053A6D3fFc20D94e",
+          name: "TM",
+          symbol: "Test MAtic",
+          decimals: 18,
+          logoURI: Image,
+        };
+
+        const newToken4 = {
+          chainId: 1,
+          address: "0x779877A7B0D9E8603169DdbD7836e478b4624789",
+          name: "TL",
+          symbol: "Test Link",
+          decimals: 18,
+          logoURI: Image,
+        };
+
+        const updatedTokenList = [
+          newToken,
+          newToken2,
+          newToken3,
+          newToken4,
+          ...fetchedTokenList,
+        ]; // Prepend the new token
         setTokens(updatedTokenList);
       } catch (error) {
         console.error("Error fetching token list:", error);
@@ -104,15 +129,31 @@ const Swap = () => {
   }
 
   let provider;
-  let providers;
   let signer;
-  if (typeof window.ethereum !== "undefined") {
-    const url = "https://mainnet.infura.io/v3/5aaa12b0e25846ffac779abc4b3eb2a5";
-    provider = new ethers.JsonRpcProvider(url);
-    providers = new Web3Provider(window.ethereum);
-    signer = providers.getSigner();
-  }
+  (async () => {
+    if (typeof window.ethereum !== "undefined") {
+      try {
+        const url =
+          "https://sepolia.infura.io/v3/5aaa12b0e25846ffac779abc4b3eb2a5";
+        const provider = new ethers.providers.JsonRpcProvider(url);
 
+        // Request access to accounts
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        const signer = provider.getSigner();
+
+        console.log("=============Signer==========");
+        console.log(signer);
+        // Your code using the provider and signer goes here
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    } else {
+      console.error("Metamask or compatible wallet not detected.");
+    }
+  })();
+
+  console.log(tokenOne.address);
   useEffect(() => {
     // Function to fetch token balances for tokenOne and tokenTwo
     const fetchTokenBalances = async () => {
@@ -137,7 +178,7 @@ const Swap = () => {
       }
 
       // Get the user's address
-      const accounts = (await providers.listAccounts())[0];
+      const accounts = (await provider.listAccounts())[0];
       // console.log(accounts);
 
       let balance;
@@ -165,77 +206,77 @@ const Swap = () => {
       // Close the modal
       setIsOpen(false);
     } catch (error) {
-      console.error("Error handling token selection:", error.message);
+      console.error("Error handling token selection:", error);
     }
   };
 
-  useEffect(() => {
-    // Function to fetch balance for default tokens
-    const fetchDefaultTokenBalances = async () => {
-      try {
-        // Check if MetaMask is available
-        if (typeof window.ethereum === "undefined") {
-          throw new Error("MetaMask not detected.");
-        }
+  // useEffect(() => {
+  //   // Function to fetch balance for default tokens
+  //   const fetchDefaultTokenBalances = async () => {
+  //     try {
+  //       // Check if MetaMask is available
+  //       if (typeof window.ethereum === "undefined") {
+  //         throw new Error("MetaMask not detected.");
+  //       }
 
-        // Get the user's address
-        const accounts = (await providers.listAccounts())[0];
-        // console.log(accounts);
+  //       // Get the user's address
+  //       const accounts = (await providers.listAccounts())[0];
+  //       // console.log(accounts);
 
-        let balance;
-        // console.log(tokenOne);
-        // Fetch balance for default token one
-        if (tokenOne.symbol === "ETH") {
-          const ethBalance = await provider.getBalance(accounts);
-          balance = Number(ethers.formatEther(ethBalance)).toFixed(5);
-        } else {
-          // Instantiate the ERC-20 token contract
-          const tokenContract = new ethers.Contract(
-            tokenOne.address,
-            ABI,
-            provider
-          );
+  //       let balance;
+  //       // console.log(tokenOne);
+  //       // Fetch balance for default token one
+  //       if (tokenOne.symbol === "ETH") {
+  //         const ethBalance = await provider.getBalance(accounts);
+  //         balance = Number(ethers.formatEther(ethBalance)).toFixed(5);
+  //       } else {
+  //         // Instantiate the ERC-20 token contract
+  //         const tokenContract = new ethers.Contract(
+  //           tokenOne.address,
+  //           ABI,
+  //           provider
+  //         );
 
-          // Get token balance
-          const tokenBalance = await tokenContract.balanceOf(accounts);
-          balance = Number(
-            ethers.formatUnits(tokenBalance, tokenOne.decimals)
-          ).toFixed(5);
-        }
+  //         // Get token balance
+  //         const tokenBalance = await tokenContract.balanceOf(accounts);
+  //         balance = Number(
+  //           ethers.formatUnits(tokenBalance, tokenOne.decimals)
+  //         ).toFixed(5);
+  //       }
 
-        // Update default token one with its balance
-        setTokenOne({ ...tokenOne, balance });
+  //       // Update default token one with its balance
+  //       setTokenOne({ ...tokenOne, balance });
 
-        // Fetch balance for default token two (if needed)
-        if (tokenTwo) {
-          if (tokenTwo.symbol === "ETH") {
-            const ethBalance = await provider.getBalance(accounts);
-            balance = Number(ethers.formatEther(ethBalance)).toFixed(5);
-          } else {
-            // Instantiate the ERC-20 token contract
-            const tokenContract = new ethers.Contract(
-              tokenTwo.address,
-              ABI,
-              provider
-            );
+  //       // Fetch balance for default token two (if needed)
+  //       if (tokenTwo) {
+  //         if (tokenTwo.symbol === "ETH") {
+  //           const ethBalance = await provider.getBalance(accounts);
+  //           balance = Number(ethers.formatEther(ethBalance)).toFixed(5);
+  //         } else {
+  //           // Instantiate the ERC-20 token contract
+  //           const tokenContract = new ethers.Contract(
+  //             tokenTwo.address,
+  //             ABI,
+  //             provider
+  //           );
 
-            // Get token balance
-            const tokenBalance = await tokenContract.balanceOf(accounts);
-            balance = Number(
-              ethers.formatUnits(tokenBalance, tokenTwo.decimals)
-            ).toFixed(5);
-          }
+  //           // Get token balance
+  //           const tokenBalance = await tokenContract.balanceOf(accounts);
+  //           balance = Number(
+  //             ethers.formatUnits(tokenBalance, tokenTwo.decimals)
+  //           ).toFixed(5);
+  //         }
 
-          // Update default token two with its balance
-          setTokenTwo({ ...tokenTwo, balance });
-        }
-      } catch (error) {
-        console.error("Error fetching default token balances:", error.message);
-      }
-    };
+  //         // Update default token two with its balance
+  //         setTokenTwo({ ...tokenTwo, balance });
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching default token balances:", error.message);
+  //     }
+  //   };
 
-    fetchDefaultTokenBalances(); // Fetch default token balances when component mounts
-  }, []); // Empty dependency array to run only once when component mounts
+  //   fetchDefaultTokenBalances(); // Fetch default token balances when component mounts
+  // }, []); // Empty dependency array to run only once when component mounts
 
   // Run this code on component mount
   // handleTokenSelect(tokenOne);
@@ -243,58 +284,164 @@ const Swap = () => {
   // handleTokenSelect(tokenTwo);
 
   // const uniswapRouterAddress = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; // Uniswap V2 Router contract address
-  const uniswapRouterAddress = "0x95c81876a3e5889f0e7420604cbbdc9df4497d00";
-  // const uniswapRouterAddress = "0xf7ffec16b53f5575fb4d9a561b0ef132eac188d3";
+  // const uniswapRouterAddress = "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008";
+  // // const uniswapRouterAddress = "0xf7ffec16b53f5575fb4d9a561b0ef132eac188d3";
 
-  const uniswapRouter = new ethers.Contract(
-    uniswapRouterAddress,
-    UNIABI,
-    signer
-  );
+  // const uniswapRouter = new ethers.Contract(
+  //   uniswapRouterAddress,
+  //   UNIABI,
+  //   signer
+  // );
 
-  const getExpectedAmountOut = async (tokenIn, tokenOut, amountIn) => {
-    try {
-      // Get token addresses
-      let tokenInAddress;
-      if (tokenOne.symbol === "ETH") {
-        tokenInAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
-      } else {
-        tokenInAddress = tokenOne.address;
-      }
+  // console.log(uniswapRouter);
 
-      const tokenOutAddress = tokenTwo.address;
+  // const getExpectedAmountOut = async (tokenIn, tokenOut, amountIn) => {
+  //   try {
+  //     // Get token addresses
+  //     let tokenInAddress;
+  //     if (tokenOne.symbol === "ETH") {
+  //       tokenInAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+  //     } else {
+  //       tokenInAddress = tokenOne.address;
+  //     }
 
-      const amountInWei = ethers.parseUnits(
-        amountIn.toString(),
-        tokenOne.decimals
-      );
+  //     const tokenOutAddress = tokenTwo.address;
 
-      // Get expected amount out
-      const amountsOut = await uniswapRouter.getAmountsOut(amountInWei, [
-        tokenInAddress,
-        tokenOutAddress,
-      ]);
+  //     const amountInWei = ethers.parseUnits(
+  //       amountIn.toString(),
+  //       tokenOne.decimals
+  //     );
 
-      // The expected amount out will be the last element in the returned array
-      const expectedAmountOutWei = amountsOut[amountsOut.length - 1];
+  //     // Get expected amount out
+  //     const amountsOut = await uniswapRouter.getAmountsOut(amountInWei, [
+  //       tokenInAddress,
+  //       tokenOutAddress,
+  //     ]);
 
-      const expectedAmountOut = ethers.formatUnits(
-        expectedAmountOutWei,
-        tokenTwo.decimals
-      );
-      // console.log(expectedAmountOut);
-      setAmount(expectedAmountOut);
-    } catch (error) {
-      console.error("Error getting expected amount out:", error);
-      setAmount("0.00");
-    }
-  };
+  //     // The expected amount out will be the last element in the returned array
+  //     const expectedAmountOutWei = amountsOut[amountsOut.length - 1];
 
-  useEffect(() => {
-    getExpectedAmountOut(tokenOne.address, tokenTwo.address, value);
-  }, [value]);
+  //     const expectedAmountOut = ethers.formatUnits(
+  //       expectedAmountOutWei,
+  //       tokenTwo.decimals
+  //     );
+  //     // console.log(expectedAmountOut);
+  //     setAmount(expectedAmountOut);
+  //   } catch (error) {
+  //     console.error("Error getting expected amount out:", error);
+  //     setAmount("0.00");
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getExpectedAmountOut(tokenOne.address, tokenTwo.address, value);
+  // }, [value]);
 
   // Example function to perform token swap
+  // const swapTokens = async (amount, extraGasFee) => {
+  //   try {
+  //     // Get token addresses
+  //     // const tokenInAddress = "0xFf0dE1ECEb20C2Bb5eb6A0F75D6F10365692B379";
+  //     // const tokenOutAddress = "0xe9e8eAe7b60b3DFcED410B0CF14a8F1D6eA207a7";
+
+  //     const tokenInAddress = tokenOne.address;
+  //     const tokenOutAddress = tokenTwo.address;
+
+  //     // Convert amount to ethers BigNumber
+  //     const amountInWei = ethers.parseUnits(
+  //       amount.toString(),
+  //       tokenOne.decimals
+  //     );
+
+  //     // Specify additional parameters for the swap (slippage tolerance, deadline, etc.)
+  //     const deadline = Math.floor(Date.now() / 1000) + 300; // 5-minute deadline
+
+  //     const acc = await providers.listAccounts();
+  //     const accounts = acc[0];
+
+  //     // console.log(accounts);
+
+  //     // Initialize token contract instance
+  //     const tokenContract = new ethers.Contract(tokenInAddress, ABI, signer);
+
+  //     // Approve tokens for spending by Uniswap Router
+  //     if (tokenInAddress != "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+  //       await tokenContract.approve(
+  //         uniswapRouterAddress, // Address of the Uniswap Router contract
+  //         amountInWei // Amount of tokens to approve for spending
+  //       );
+  //     }
+
+  //     // Proceed with the swap only if the user confirms
+  //     const confirmed = window.confirm("Do you want to proceed with the swap?");
+
+  //     if (!confirmed) return;
+
+  //     const gasPrice = await signer.getGasPrice();
+
+  //     const gasLimit = gasPrice.toString();
+
+  //     // const totalGasFee = gasLimit.mul(gasPrice);
+  //     const bribe = ethers.toBigInt(
+  //       Math.floor(extraGasFee * 1e18) + gasLimit.toString()
+  //     );
+  //     console.log(bribe);
+  //     let tx; // Declare tx variable outside of conditional blocks
+
+  //     if (tokenInAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+  //       const weiGasAmount = extraGasFee
+  //         ? ethers.parseUnits(extraGasFee, "gwei")
+  //         : 0;
+  //       // (uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)
+  //       const functionName = "swapExactETHForTokens";
+  //       const contractParams = [
+  //         "0", // Minimum amount of tokenOut to receive (0 for no minimum)
+  //         ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", tokenOutAddress], // Path of tokens to swap
+  //         accounts.toString(), // Recipient of tokenOut
+  //         deadline,
+  //         weiGasAmount,
+  //       ];
+
+  //       const transaction = {
+  //         to: uniswapRouter.address, // Address of the Uniswap router contract
+  //         value: ethers.parseEther(amount), // Convert amount of ETH to Wei
+  //         data: uniswapRouter.interface.encodeFunctionData(
+  //           functionName,
+  //           contractParams
+  //         ),
+  //         gasLimit: ethers.toBigInt(300000), // Specify gas limit here
+  //       };
+
+  //       tx = await signer.sendTransaction(transaction);
+  //     } else {
+  //       tx = await uniswapRouter.swapExactTokensForTokens(
+  //         amountInWei.toString(), // Amount of token to swap
+  //         "0", // Minimum amount of tokenOut to receive (0 for no minimum)
+  //         [tokenInAddress, tokenOutAddress], // Path of tokens to swap
+  //         accounts.toString(), // Recipient of tokenOut
+  //         deadline,
+  //         // { gasLimit: gasLimit, value: bribe }
+  //         { gasLimit: "22890" } // Pass gas price as string
+  //       );
+  //     }
+
+  //     await tx.wait(); // Wait for transaction to be mined
+
+  //     console.log("Swap successful!");
+  //     alert("Swap Successful");
+  //   } catch (error) {
+  //     console.error("Error swapping tokens:", error.message);
+  //     let err;
+  //     if (error.message.includes("insufficient")) {
+  //       err = "Insufficient funds for Gas Fee";
+  //     } else if (error.message.includes("rejected")) {
+  //       err = "You rejected this transaction in MetaMask";
+  //     }
+
+  //     alert("Error swapping tokens: " + err);
+  //   }
+  // };
+
   const swapTokens = async (amount, extraGasFee) => {
     try {
       // Get token addresses
@@ -313,76 +460,129 @@ const Swap = () => {
       // Specify additional parameters for the swap (slippage tolerance, deadline, etc.)
       const deadline = Math.floor(Date.now() / 1000) + 300; // 5-minute deadline
 
-      const acc = await providers.listAccounts();
+      const acc = await provider.listAccounts();
       const accounts = acc[0];
 
-      // console.log(accounts);
-
-      // Initialize token contract instance
       const tokenContract = new ethers.Contract(tokenInAddress, ABI, signer);
 
-      // Approve tokens for spending by Uniswap Router
-      if (tokenInAddress != "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
-        await tokenContract.approve(
-          uniswapRouterAddress, // Address of the Uniswap Router contract
-          amountInWei // Amount of tokens to approve for spending
-        );
-      }
+      const uniswapRouterAddress = "0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008";
+      await tokenContract.approve(uniswapRouterAddress, amountInWei);
 
-      // Proceed with the swap only if the user confirms
-      const confirmed = window.confirm("Do you want to proceed with the swap?");
+      const uniswapRouter = new ethers.Contract(
+        uniswapRouterAddress,
+        UNIABI,
+        signer
+      );
 
-      if (!confirmed) return;
+      console.log(uniswapRouter);
+      // let tx;
+      // tx = await uniswapRouter.swapExactTokensForTokens(
+      //   amountInWei.toString(), // Amount of token to swap
+      //   "0", // Minimum amount of tokenOut to receive (0 for no minimum)
+      //   [tokenInAddress, tokenOutAddress], // Path of tokens to swap
+      //   accounts.toString(), // Recipient of tokenOut
+      //   deadline,
+      //   // { gasLimit: gasLimit, value: bribe }
+      //   { gasLimit: "30000" } // Pass gas price as string
+      // );
 
-      const gasPrice = await signer.getGasPrice();
+      const weiGasAmount = extraGasFee
+        ? ethers.parseUnits(extraGasFee, "gwei")
+        : 0;
+      // (uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)
+      const functionName = "swapExactETHForTokens";
+      const contractParams = [
+        "0", // Minimum amount of tokenOut to receive (0 for no minimum)
+        ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", tokenOutAddress], // Path of tokens to swap
+        accounts.toString(), // Recipient of tokenOut
+        deadline,
+      ];
 
-      const gasLimit = gasPrice.toString();
+      const transaction = {
+        to: uniswapRouter.address, // Address of the Uniswap router contract
+        value: ethers.parseEther(amount), // Convert amount of ETH to Wei
+        data: uniswapRouter.interface.encodeFunctionData(
+          functionName,
+          contractParams
+        ),
+        gasLimit: ethers.toBigInt(300000), // Specify gas limit here
+      };
+
+      tx = await signer.sendTransaction(transaction);
+
+      // if (tokenInAddress != "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+      //   await tokenContract.approve(uniswapRouterAddress, amountInWei);
+      // }
+
+      // const confirmed = window.confirm("Do you want to proceed with the swap?");
+
+      // if (!confirmed) return;
+
+      // const gasPrice = await signer.getGasPrice();
+
+      // const gasLimit = gasPrice.toString();
 
       // const totalGasFee = gasLimit.mul(gasPrice);
-      const bribe = ethers.toBigInt(
-        Math.floor(extraGasFee * 1e18) + gasLimit.toString()
-      );
-      console.log(bribe);
-      let tx; // Declare tx variable outside of conditional blocks
+      // const bribe = ethers.toBigInt(
+      //   Math.floor(extraGasFee * 1e18) + gasLimit.toString()
+      // );
+      // console.log(bribe);
+      // let tx; // Declare tx variable outside of conditional blocks
 
-      if (tokenInAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
-        const weiGasAmount = extraGasFee
-          ? ethers.parseUnits(extraGasFee, "gwei")
-          : 0;
-        // (uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)
-        const functionName = "swapExactETHForTokens";
-        const contractParams = [
-          "0", // Minimum amount of tokenOut to receive (0 for no minimum)
-          ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", tokenOutAddress], // Path of tokens to swap
-          accounts.toString(), // Recipient of tokenOut
-          deadline,
-          weiGasAmount,
-        ];
+      // if (tokenInAddress === "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE") {
+      //   const weiGasAmount = extraGasFee
+      //     ? ethers.parseUnits(extraGasFee, "gwei")
+      //     : 0;
+      //   // (uint amountOutMin, address[] calldata path, address to, uint deadline, uint minerBribe) external payable returns (uint[] memory amounts)
+      //   const functionName = "swapExactETHForTokens";
+      //   const contractParams = [
+      //     "0", // Minimum amount of tokenOut to receive (0 for no minimum)
+      //     ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", tokenOutAddress], // Path of tokens to swap
+      //     accounts.toString(), // Recipient of tokenOut
+      //     deadline,
+      //     weiGasAmount,
+      //   ];
 
-        const transaction = {
-          to: uniswapRouter.address, // Address of the Uniswap router contract
-          value: ethers.parseEther(amount), // Convert amount of ETH to Wei
-          data: uniswapRouter.interface.encodeFunctionData(
-            functionName,
-            contractParams
-          ),
-          gasLimit: ethers.toBigInt(300000), // Specify gas limit here
-        };
+      //   const transaction = {
+      //     to: uniswapRouter.address, // Address of the Uniswap router contract
+      //     value: ethers.parseEther(amount), // Convert amount of ETH to Wei
+      //     data: uniswapRouter.interface.encodeFunctionData(
+      //       functionName,
+      //       contractParams
+      //     ),
+      //     gasLimit: ethers.toBigInt(300000), // Specify gas limit here
+      //   };
 
-        tx = await signer.sendTransaction(transaction);
-      } else {
-        tx = await uniswapRouter.swapExactTokensForTokens(
-          amountInWei.toString(), // Amount of token to swap
-          "0", // Minimum amount of tokenOut to receive (0 for no minimum)
-          [tokenInAddress, tokenOutAddress], // Path of tokens to swap
-          accounts.toString(), // Recipient of tokenOut
-          deadline,
-          // Deadline for the swap
-          { gasLimit: gasLimit, value: bribe } // Pass gas price as string
-        );
-      }
+      //   tx = await signer.sendTransaction(transaction);
+      // } else {
+      //   tx = await uniswapRouter.swapExactTokensForTokens(
+      //     amountInWei.toString(), // Amount of token to swap
+      //     "0", // Minimum amount of tokenOut to receive (0 for no minimum)
+      //     [tokenInAddress, tokenOutAddress], // Path of tokens to swap
+      //     accounts.toString(), // Recipient of tokenOut
+      //     deadline,
+      //     // { gasLimit: gasLimit, value: bribe }
+      //     { gasLimit: "22890" } // Pass gas price as string
+      //   );
+      // }
+      console.log(tx);
+      const receipt = await tx.wait(); // Wait for transaction to be mined
+      console.log(receipt.confirmations);
+      // console.log("txn hash", tx.hash);
 
-      await tx.wait(); // Wait for transaction to be mined
+      // let receipt = null;
+
+      // receipt = await provider.getTransactionReceipt(tx.hash);
+
+      // if (receipt === null) {
+      //   console.log(`Trying again to fetch txn receipt....`);
+      // }
+
+      // console.log(`Receipt confirmations:`, receipt.confirmations);
+
+      // console.info(
+      //   `Transaction receipt : https://www.bscscan.com/tx/${receipt.logs[1].transactionHash}`
+      // );
 
       console.log("Swap successful!");
       alert("Swap Successful");
@@ -569,6 +769,7 @@ const Swap = () => {
             >
               SWAP
             </button>
+            <inpu>test</inpu>
           </div>
         </div>
       </div>
